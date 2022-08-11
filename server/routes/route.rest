@@ -1,4 +1,4 @@
-GET http://localhost:8000/api/reports/orders HTTP/1.1
+GET http://localhost:8000/api/visitor HTTP/1.1
 
 ###
 GET http://localhost:8000/api/reports/customers?start=2022-07-24&end=2022-08-23&id=62c82769878a9abd8efe4c62 HTTP/1.1

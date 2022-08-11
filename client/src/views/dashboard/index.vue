@@ -51,35 +51,19 @@
             <h3
               class="title blue-grey--text text--darken-2 font-weight-regular"
             >
-              Visit Separation
+              Visitor Data
             </h3>
-            <div class="py-6">
-              <v-sparkline
-                type="bar"
-                :fill="fill"
-                height="265px"
-                :gradient="gradient"
-                :line-width="width"
-                :padding="padding"
-                :smooth="radius || false"
-                :value="value"
-                auto-draw
-              ></v-sparkline>
-            </div>
             <v-simple-table>
               <template v-slot:default>
                 <tbody>
                   <tr>
-                    <td>Mobile</td>
-                    <td class="font-weight-medium">38.5%</td>
-                  </tr>
-                  <tr>
-                    <td>Tablet</td>
-                    <td class="font-weight-medium">30.8%</td>
+                    <td>Your IP Address</td>
+                    <td class="font-weight-medium">{{ipAddress}}</td>
                   </tr>
                 </tbody>
               </template>
             </v-simple-table>
+            <GoogleMap />
           </v-card-text>
         </v-card>
       </v-col>
@@ -263,6 +247,8 @@
 
 
 <script>
+/* eslint-disable */
+import GoogleMap from '@/components/GoogleMap.vue'
 const gradients = [
   ["#745af2"],
   ["#745af2"],
@@ -283,7 +269,11 @@ const gradients2 = [
 
 export default {
   name: "BasicDashboard",
+  components: {
+    GoogleMap
+  },
   data: () => ({
+    ipAddress: '',
     select: { state: "January 2020", abbr: "FL" },
     monthitems: [
       { state: "January 2020", abbr: "FL" },
@@ -472,6 +462,30 @@ export default {
 
       this.task = null;
     },
+    async getIpVisitor(){
+      fetch('https://api.ipify.org?format=json')
+      .then(x => x.json())
+      .then(({ ip }) => {
+          this.ipAddress = ip
+      });
+    },
+    getVisitorLocation(){
+      const success = (position) => {
+            const latitude  = position.coords.latitude;
+            const longitude = position.coords.longitude;
+        };
+
+        const error = (err) => {
+            console.log(error)
+        };
+
+        // This will open permission popup
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
   },
+  created() {
+    this.getIpVisitor();
+    this.getVisitorLocation();
+  }
 };
 </script>

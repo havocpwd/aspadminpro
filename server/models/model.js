@@ -84,6 +84,19 @@ module.exports = (mongoose) => {
         object.id = _id;
         return object;
     })
+
+    const visitorSchema = new mongoose.Schema({
+        ipAddress: String,
+        latitude: String,
+        longitude: String,
+        dateAccess: Date,
+    });
+
+    visitorSchema.method("toJSON", function(){
+        const { __v, _id, ...object } = this.toObject();
+        object.id = _id;
+        return object;
+    })
     
     const categorySchema = new mongoose.Schema({
         code: String,
@@ -251,12 +264,13 @@ module.exports = (mongoose) => {
     const Payment = mongoose.model("payments", paymentSchema)
     const Currency = mongoose.model("currencies", curencySchema)
     const Uom = mongoose.model('uoms', uomSchema)
+    const Visitor = mongoose.model('visitor',visitorSchema)
     const Category = mongoose.model('categories', categorySchema)
     const Product = mongoose.model("products", productSchema)
     const Partner = mongoose.model("partners", partnerSchema)
-    const OrderDetail = mongoose.model('orderdetails', orderDetailSchema);
-    const Order = mongoose.model('orders', orderSchema);
-    const dbSchema = {Currency,Uom,Category,Product,Partner,Payment,Order,OrderDetail}
+    const OrderDetail = mongoose.model('orderdetails', orderDetailSchema)
+    const Order = mongoose.model('orders', orderSchema)
+    const dbSchema = {Currency,Uom,Visitor,Category,Product,Partner,Payment,Order,OrderDetail}
 
     return dbSchema
 }
