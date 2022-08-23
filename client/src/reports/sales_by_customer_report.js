@@ -27,6 +27,39 @@ exports.createSalesReport = async (data,periode) => {
         return sum;
     }
 
+    detailOrdersData = Orders.flatMap(({
+        orderNo,
+        dateIssued,
+        partner,
+        deliverTo,
+        orderDetail
+    }) => orderDetail.map(s => ({
+        orderNo:orderNo,
+        dateIssued:dateIssued,
+        partner:partner,
+        deliverTo:deliverTo,
+        ...s
+    })));
+    console.log(detailOrdersData)
+    function getDataDetailOrders(data){
+        var columns = ['orderNo', 'dateIssued','partner','deliverTo','shortDesc','qtyOrdered','unitPrice','total']
+        var body = []
+        body.push([{  fillColor: '#3A4D8F',text: 'Order No', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Tanggal', style: 'tableHeader'}, {fillColor: '#3A4D8F',text: 'Pelanggan', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'dikirim ke', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Nama Barang', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'QTY', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Harga', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Total', style: 'tableHeader'},])
+        data.forEach(function(row) {
+            var dataRow = [];
+            columns.forEach(function(column){
+                dataRow.push({text:row[column].toString(),style:'contentleft',fontSize:8});
+            })
+            body.push(dataRow);
+        })
+        return body;
+    }
+
+    // (async () => {
+    //     console.log(await getDataDetailOrders(detailOrdersData));
+    // }
+    // )()
+
     let mapingOrders =[]
     Orders.forEach(function(i,index){
         var map = {}
@@ -57,6 +90,7 @@ exports.createSalesReport = async (data,periode) => {
         body.push([{colSpan: 5,text:'Grant Total :',style: 'subheader'},'','','','',{text: currencyFormat(grandTotal),style: 'subheader'}])
         return body;
     }
+
     let docDefinition = {
         content: [
             {
@@ -64,6 +98,17 @@ exports.createSalesReport = async (data,periode) => {
                     {text: 'Laporan Piutang Pelanggan', style: 'header'},
                     {text: 'Periode : ' + periode, style: 'subheader'},
                 ],
+            },
+            {
+                style: 'tableExample',
+                table: {
+                    headerRows: 1,
+                    widths: [ 'auto','auto', 'auto', 'auto','auto','auto','auto','*' ],
+                    body: getDataDetailOrders(detailOrdersData)
+                }
+            },
+            {
+                text: ' '
             },
             {
                 style: 'tableExample',

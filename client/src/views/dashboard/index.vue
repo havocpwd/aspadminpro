@@ -57,8 +57,16 @@
               <template v-slot:default>
                 <tbody>
                   <tr>
-                    <td>Your IP Address</td>
+                    <td>IP Address</td>
                     <td class="font-weight-medium">{{ipAddress}}</td>
+                  </tr>
+                  <tr>
+                    <td>Latitude</td>
+                    <td class="font-weight-medium">{{latitude}}</td>
+                  </tr>
+                  <tr>
+                    <td>Longitude</td>
+                    <td class="font-weight-medium">{{longitude}}</td>
                   </tr>
                 </tbody>
               </template>
@@ -274,6 +282,8 @@ export default {
   },
   data: () => ({
     ipAddress: '',
+    latitude:'',
+    longitude:'',
     select: { state: "January 2020", abbr: "FL" },
     monthitems: [
       { state: "January 2020", abbr: "FL" },
@@ -471,8 +481,8 @@ export default {
     },
     getVisitorLocation(){
       const success = (position) => {
-            const latitude  = position.coords.latitude;
-            const longitude = position.coords.longitude;
+            this.latitude  = position.coords.latitude;
+            this.longitude = position.coords.longitude;
         };
 
         const error = (err) => {
