@@ -3,7 +3,7 @@
 <v-data-table
     :headers="headers"
     :options="tableOptions"
-    :footer-props="{'items-per-page-options':[15, 30, 50, 100, -1]}"
+    :footer-props="{'items-per-page-options':[60, 70, 100, -1]}"
     :items="orders"
     :search="search"
     :items-per-page="30"
@@ -86,7 +86,7 @@ export default {
         menu: false,
         dates: ['2019-09-10', '2019-09-20'],
         tableOptions: {
-            itemsPerPage: 30
+            itemsPerPage: 60
         },
         headers: [
           { text: 'No',value: 'index',class: "primary"},

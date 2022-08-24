@@ -29,6 +29,14 @@ exports.createSalesReport = async (data,periode) => {
         return sum;
     }
 
+    function getTotalProfit(ar) {
+        var sum = 0;
+        for (var i = 0; i < ar.length; i++) {
+          sum += ar[i].profit;
+        }
+        return sum;
+    }
+
     function getSedekah(total) {
         var sum = 0;
         sum = (2.5/100) * total;
@@ -55,19 +63,20 @@ exports.createSalesReport = async (data,periode) => {
     })
     function getOrderItem(data) {
         var grandTotal = getGrandTotal(Orders)
-        var sedekah  = getSedekah(grandTotal)
+        var totalProfit = getTotalProfit(Orders)
+        var sedekah  = getSedekah(totalProfit)
         var columns = ['no','orderNo', 'dateIssued','partner','deliverTo','cogsTotal','grandTotal','profit']
         var body = []
         body.push([{  fillColor: '#3A4D8F',text: 'No', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'No Invoice', style: 'tableHeader'}, {fillColor: '#3A4D8F',text: 'Tanggal', style: 'tableHeader'}, {fillColor: '#3A4D8F',text: 'Pelanggan', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'dikirim ke', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'HPP', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Total Invoice', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Profit', style: 'tableHeader'}])
         data.forEach(function(row) {
             var dataRow = [];
             columns.forEach(function(column){
-                dataRow.push({text:row[column].toString(),style:'contentleft',fontSize:9});
+                dataRow.push({text:row[column].toString(),style:'contentleft',fontSize:8});
             })
             body.push(dataRow);
         })
-        body.push([{colSpan: 7,text:'Grant Total :',style: 'subheader'},'','','','','','',{text: currencyFormat(grandTotal),style: 'subheader'}])
-        body.push([{colSpan: 7,text:'Sedekah 2,5% :',style: 'subheader'},'','','','','','',{text: currencyFormat(sedekah),style: 'subheader'}])
+        body.push([{colSpan: 6,text:'Grant Total :',style: 'subheader'},'','','','','',{text: currencyFormat(grandTotal),style: 'subheader'},{text: currencyFormat(totalProfit),style: 'subheader'}])
+        body.push([{colSpan: 6,text:'Sedekah 2,5% :',style: 'subheader'},'','','','','','',{text: currencyFormat(sedekah),style: 'subheader'}])
         return body;
     }
     let docDefinition = {
