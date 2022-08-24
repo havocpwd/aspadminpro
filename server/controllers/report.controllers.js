@@ -81,7 +81,8 @@ exports.getOrdersReports = async (req, res)=>{
                 cogsTotal:1,
                 orderDetailTotal:1
             } 
-        }
+        },
+        { $sort: { dateIssued: -1 } }
     ])
     .then((result) => { 
         res.send({"orders": result})
