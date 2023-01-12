@@ -42,7 +42,7 @@
               <v-date-picker
                   v-model="dates"
                   range
-                  @change="retrieveorders"
+                  @change="getdataorders"
               >
               <v-spacer></v-spacer>
               <v-btn
@@ -70,7 +70,7 @@
             :item-text = "getNameCustomers"
             item-value = "id"
             dense
-            @change="retrieveorders"
+            @change="getdataorders"
             ></v-autocomplete>
               <v-btn
               color="primary"
@@ -149,6 +149,7 @@ export default {
           { text: "Actions", value: "actions", sortable: false ,class: "primary"},
         ],
         orders: [],
+        purchaseorders: [],
         dateStart: new Date(),
         dateEnd: new Date(),
         partnerSelected:{},
@@ -181,6 +182,10 @@ export default {
           }
           this.dates = [this.dateStart.toISOString().substring(0, 10),this.dateEnd.toISOString().substring(0, 10)]
         },
+        getdataorders(){
+          this.retrieveorders();
+          this.retrieveopurchaserders();
+        },
         retrieveorders() {
           if(Object.keys(this.partnerSelected).length === 0){
               console.log('Pilih customers terlebih dahulu')
@@ -189,6 +194,22 @@ export default {
               .then((response) => {
               this.loading = false;
               this.orders = response.data.orders.map(this.getDisplay);
+              console.log(this.orders);
+              })
+              .catch((e) => {
+              console.log(e);
+              });
+            }
+        },
+        retrieveopurchaserders() {
+          if(Object.keys(this.partnerSelected).length === 0){
+              console.log('Pilih customers terlebih dahulu')
+            }else{
+              reportService.getPurchaseOrderByPartner(this.dates[0],this.dates[1],this.partnerSelected)
+              .then((response) => {
+              this.loading = false;
+              this.purchaseorders = response.data.orders.map(this.getDisplay);
+              console.log(this.purchaseorders);
               })
               .catch((e) => {
               console.log(e);
@@ -222,7 +243,7 @@ export default {
             return `${customer.first_name} ${customer.last_name}`;
         },
         async printSalesReport(){
-          const docDefinition = await salesOrderByCustomer.createSalesReport(this.orders, this.dates);
+          const docDefinition = await salesOrderByCustomer.createSalesReport(this.orders,this.purchaseorders, this.dates);
           const pdf = await pdfMake.createPdf(docDefinition);
           pdf.open();
         }

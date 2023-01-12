@@ -4,7 +4,7 @@ const OrderDetail = db.dbSchema.OrderDetail
 
 exports.findAll = (req, res)=>{
     if(Object.keys(req.query).length === 0 && req.query.constructor === Object){
-        Order.find({orderType:"SaleOrder"}).populate([
+        Order.find({orderType:"PurchaseOrder"}).populate([
             {path: 'partners'},
             {path: 'payments',select: 'desc'},
             {path: 'orderdetails',
@@ -32,7 +32,7 @@ exports.findAll = (req, res)=>{
         start.setHours(0, 0, 0, 0);
         const end = new Date(queryParameters.end);
         end.setHours(23, 59, 59, 999);
-        Order.find({dateIssued:{$gte:start,$lte:end},orderType:"SaleOrder"}).populate([
+        Order.find({dateIssued:{$gte:start,$lte:end}, orderType:"PurchaseOrder"}).populate([
             {path: 'partners'},
             {path: 'payments',select: 'desc'},
             {path: 'orderdetails',
@@ -141,7 +141,7 @@ const createOrderDet = function(orderId, datadetailBody) {
 
 exports.create = async (req,res) => {
     const data = new Order({
-        orderType: "SaleOrder",
+        orderType: "PurchaseOrder",
         orderNo: req.body.orderNo,
         dateIssued: req.body.dateIssued,
         partners: req.body.partners,

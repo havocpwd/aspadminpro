@@ -125,6 +125,33 @@ const routes = [
               }
             ]
           },
+          {
+            path: '/po',
+            component: () => import('@/views/purchaseorders/indexComponent.vue'),
+            children: [
+              {
+                path: '',
+                name:'Purchase Orders',
+                component: () => import('@/views/purchaseorders/listComponent.vue')
+              },
+              {
+                path: 'new',
+                name:'New Purchase Order',
+                component: () => import('@/views/purchaseorders/newComponent.vue')
+              },
+              {
+                path: 'reports',
+                name:'LaporanPembelian',
+                component: () => import('@/views/purchaseorders/reportComponent.vue')
+              },
+              {
+                path: ':id',
+                name:'EditPurchaseOrder',
+                props: true,
+                component: () => import('@/views/purchaseorders/newComponent.vue')
+              }
+            ]
+          },
       ]
   },
   {

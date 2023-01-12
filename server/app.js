@@ -42,6 +42,7 @@ require('./routes/visitor.routes')(app)
 require('./routes/category.routes')(app)
 require('./routes/product.routes')(app)
 require('./routes/order.routes')(app)
+require('./routes/purchaseOrder.routes')(app)
 require('./routes/orderdetail.routes')(app)
 require('./routes/reports.routes')(app)
 

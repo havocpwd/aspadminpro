@@ -3,7 +3,9 @@ module.exports = (app) => {
     const router = require('express').Router()
 
     router.get('/orders', report.getOrdersReports)
-    router.get('/customers',report.getOrdersByPartners)
+    router.get('/purchaseorders', report.getPurchaseOrdersReports)
+    router.get('/customersorders',report.getOrdersByPartners)
+    router.get('/customerspurchaseorders',report.getPurchaseOrdersByPartners)
 
     app.use('/api/reports', router)
 }

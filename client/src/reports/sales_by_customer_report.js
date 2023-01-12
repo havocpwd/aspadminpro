@@ -1,12 +1,18 @@
 /* eslint-disable */
-exports.createSalesReport = async (data,periode) => {
+exports.createSalesReport = async (dataSO,dataPO,periode) => {
     function currencyFormat(num) {
         return 'Rp. ' + num.toFixed().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
     }
-    let Orders = []
-    data.forEach(function(i) {
+    let Orders = [];
+    let POrders =[];
+    dataSO.forEach(function(i) {
         var order = {}
-        order.dateIssued = i.dateIssued
+        let date = new Date(i.dateIssued);
+        order.dateIssued = date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric"
+        });
         order.deliverTo = i.deliverTo
         order.deliveryFee = i.deliveryFee
         order.discount = i.discount
@@ -17,6 +23,26 @@ exports.createSalesReport = async (data,periode) => {
         order.total = i.total
         order.orderDetail= i.orderDetail
         Orders.push(order);
+    })
+
+    dataPO.forEach(function(i) {
+        var order = {}
+        let date = new Date(i.dateIssued);
+        order.dateIssued = date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric"
+        });
+        order.deliverTo = i.deliverTo
+        order.deliveryFee = i.deliveryFee
+        order.discount = i.discount
+        order.note = i.note
+        order.orderNo = i.orderNo
+        order.partner = i.partner
+        order.payment = i.payment
+        order.total = i.total
+        order.orderDetail= i.orderDetail
+        POrders.push(order);
     })
 
     function getGrandTotal(ar) {
@@ -40,7 +66,21 @@ exports.createSalesReport = async (data,periode) => {
         deliverTo:deliverTo,
         ...s
     })));
-    console.log(detailOrdersData)
+
+    detailPOrdersData = POrders.flatMap(({
+        orderNo,
+        dateIssued,
+        partner,
+        deliverTo,
+        orderDetail
+    }) => orderDetail.map(s => ({
+        orderNo:orderNo,
+        dateIssued:dateIssued,
+        partner:partner,
+        deliverTo:deliverTo,
+        ...s
+    })));
+
     function getDataDetailOrders(data){
         var columns = ['orderNo', 'dateIssued','partner','deliverTo','shortDesc','qtyOrdered','unitPrice','total']
         var body = []
@@ -75,6 +115,23 @@ exports.createSalesReport = async (data,periode) => {
         map.grandTotal = currencyFormat(i.total)
         mapingOrders.push(map);
     })
+
+    let mapingPOrders =[]
+    POrders.forEach(function(i,index){
+        var map = {}
+        map.no = index + 1
+        map.dateIssued = i.dateIssued
+        map.deliverTo = i.deliverTo
+        map.deliveryFee = i.deliveryFee
+        map.discount = i.discount
+        map.note = i.note
+        map.orderNo = i.orderNo
+        map.partner = i.partner
+        map.payment = i.payment
+        map.grandTotal = currencyFormat(i.total)
+        mapingPOrders.push(map);
+    })
+
     function getOrderItem(data) {
         var grandTotal = getGrandTotal(Orders)
         var columns = ['no','orderNo', 'dateIssued','partner','deliverTo','grandTotal']
@@ -87,8 +144,30 @@ exports.createSalesReport = async (data,periode) => {
             })
             body.push(dataRow);
         })
-        body.push([{colSpan: 5,text:'Grant Total :',style: 'subheader'},'','','','',{text: currencyFormat(grandTotal),style: 'subheader'}])
+        body.push([{colSpan: 5,text:'Total :',style: 'subheader'},'','','','',{text: currencyFormat(grandTotal),style: 'subheader'}])
         return body;
+    }
+
+    function getPOrderItem(data) {
+        var grandTotal = getGrandTotal(POrders)
+        var columns = ['no','orderNo', 'dateIssued','partner','deliverTo','grandTotal']
+        var body = []
+        body.push([{  fillColor: '#3A4D8F',text: 'No', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'No Invoice', style: 'tableHeader'}, {fillColor: '#3A4D8F',text: 'Tanggal', style: 'tableHeader'}, {fillColor: '#3A4D8F',text: 'Supplier', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'dikirim ke', style: 'tableHeader'},{fillColor: '#3A4D8F',text: 'Total Invoice', style: 'tableHeader'}])
+        data.forEach(function(row) {
+            var dataRow = [];
+            columns.forEach(function(column){
+                dataRow.push({text:row[column].toString(),style:'contentleft',fontSize:9});
+            })
+            body.push(dataRow);
+        })
+        body.push([{colSpan: 5,text:'Total :',style: 'subheader'},'','','','',{text: currencyFormat(grandTotal),style: 'subheader'}])
+        return body;
+    }
+
+    function getGrandTotalOrder(dataSO, dataPO){
+        let GrandTotalOrder = 0;
+        GrandTotalOrder = dataSO - dataPO;
+        return GrandTotalOrder;
     }
 
     let docDefinition = {
@@ -134,6 +213,67 @@ exports.createSalesReport = async (data,periode) => {
                                 return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
                             }
                         },
+            },
+            {
+                text: ''
+            },
+            {
+                text: ''
+            },
+            {
+                text: 'hutang', bold: true, style: 'contentup'
+            },
+            {
+                style: 'tableExample',
+                table: {
+                    headerRows: 1,
+                    widths: [ 'auto','auto', 'auto', 'auto','auto','*' ],
+                    body: getPOrderItem(mapingPOrders)
+                },
+                layout: {
+                            hLineWidth: function (i, node) {
+                                return (i === 0 || i === node.table.body.length) ? 1 : 1;
+                            },
+                            vLineWidth: function (i, node) {
+                                return (i === 0 || i === node.table.widths.length) ? 1 : 1;
+                            },
+                            hLineColor: function (i, node) {
+                                return 'grey';
+                            },
+                            vLineColor: function (i, node) {
+                                return 'grey';
+                            },
+                            fillColor: function (rowIndex, node, columnIndex) {
+                                return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
+                            }
+                        },
+            },
+            {
+                style: 'tableExample',
+                table: {
+                    headerRows: 1,
+                    widths: [ '*', '*', '*', '*' ,'*'],
+                    body: [
+                        [ { colSpan: 4,text: 'Grand Total', bold: true ,style:'subheader'}, '', '', '',{text: currencyFormat(getGrandTotalOrder(getGrandTotal(Orders),getGrandTotal(POrders))), style: 'subheader'}]
+                      ]
+                },
+                layout: {
+                    hLineWidth: function (i, node) {
+                        return (i === 0 || i === node.table.body.length) ? 1 : 1;
+                    },
+                    vLineWidth: function (i, node) {
+                        return (i === 0 || i === node.table.widths.length) ? 1 : 1;
+                    },
+                    hLineColor: function (i, node) {
+                        return 'grey';
+                    },
+                    vLineColor: function (i, node) {
+                        return 'grey';
+                    },
+                    fillColor: function (rowIndex, node, columnIndex) {
+                        return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
+                    }
+                },
             },
             {text: '* Laporan ini dibuat berdasarkan dengan data yang sudah masuk kedalam system.', style: 'small'},
         ],

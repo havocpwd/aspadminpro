@@ -26,7 +26,7 @@ exports.getByTypeCustomer = (req, res)=>{
 }
 
 exports.getByTypeSupplier = (req, res)=>{
-    Partner.getByType('Supplier')
+    Partner.find()
     .then((result) => {
         res.send({"partners": result})
     })

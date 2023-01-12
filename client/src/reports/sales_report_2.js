@@ -6,7 +6,12 @@ exports.createSalesReport = async (data,periode) => {
     let Orders = []
     data.forEach(function(i) {
         var order = {}
-        order.dateIssued = i.dateIssued
+        let date = new Date(i.dateIssued);
+        order.dateIssued = date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric"
+        });
         order.deliverTo = i.deliverTo
         order.deliveryFee = i.deliveryFee
         order.discount = i.discount
@@ -116,13 +121,13 @@ exports.createSalesReport = async (data,periode) => {
         ],
         styles: {
             header: {
-                fontSize: 12,
+                fontSize: 10,
                 bold: true,
                 color: '#3A4D8F',
                 margin: [0, 0, 0, 30]
             },
             subheader: {
-                fontSize: 10,
+                fontSize: 8,
                 alignment: 'right',
                 margin: [0, 0, 0, 1]
             },
