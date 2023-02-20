@@ -5,7 +5,7 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" dark icon @click="EditOrder" v-if="id"> <v-icon>mdi-pencil</v-icon> </v-btn>
         <v-btn color="primary" dark icon @click="NewOrder" v-else> <v-icon>mdi-plus-circle</v-icon> </v-btn>
-        <v-btn color="primary" dark icon> <v-icon>mdi-printer</v-icon> </v-btn>
+        <v-btn color="primary" dark icon @click="generateInvoice"> <v-icon>mdi-printer</v-icon> </v-btn>
         </v-toolbar>
         <v-form
             ref="form"
@@ -288,7 +288,7 @@ import purchaseOrderService from '@/services/purchaseOrderService';
 import orderDetailService from '@/services/orderDetailService';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-// import soInvoice from "@/reports/so_invoice";
+import poInvoice from "@/reports/po_invoice";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export default {
     props:['id'],
@@ -575,12 +575,12 @@ export default {
             this.retrievePeyments();
             this.retrieveProducts();
         },
-        // async generateInvoice(){
-        //     const docDefinition = await soInvoice.createInvoice(this.order,this.orderDetail,this.subtotalDetail,this.grandTotal);
-        //     const pdf = await pdfMake.createPdf(docDefinition);
-        //     pdf.download(this.order.custName.split(' ').join('_')+'_SO'+this.order.orderNo+'.pdf');
-        //     pdf.open();
-        // }
+        async generateInvoice(){
+            const docDefinition = await poInvoice.createInvoice(this.order,this.orderDetail,this.subtotalDetail,this.grandTotal);
+            const pdf = await pdfMake.createPdf(docDefinition);
+            pdf.download(this.order.custName.split(' ').join('_')+'_PO'+this.order.orderNo+'.pdf');
+            pdf.open();
+        }
     }
 }
 </script>
